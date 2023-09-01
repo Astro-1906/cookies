@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #6d6d6d;
+            color: rgb(0, 0, 0);
+            background-size: cover;
+            background-repeat: no-repeat;
+            overflow: hidden; /* Evita el desplazamiento vertical */
+            position: relative; /* Añade esto para el fondo adicional */
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centra el fondo */
+            width: 100%;
+            height: 100%;
+            background-color: #76008d; /* Color del segundo fondo */
+            opacity: 0.5; /* Opacidad del segundo fondo */
+            z-index: -1; /* Asegura que el segundo fondo esté detrás de todo */
+        }
+        
+        .heart-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .heart {
+            position: relative;
+            width: 100px;
+            height: 90px;
+        }
+
+        .heart:before,
+        .heart:after {
+            position: absolute;
+            content: "";
+            left: 50px;
+            top: 0;
+            width: 50px;
+            height: 80px;
+            background-color: red;
+            border-radius: 50px 50px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+
+        .heart:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .question-container {
+            margin-top: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .button-yes {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .button-no {
+            background-color: #f44336;
+            color: white;
+        }
+
+        #spotifyEmbed {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 280px; /* Ajusta el ancho del reproductor */
+            height: 210px; /* Ajusta la altura del reproductor */
+            margin: 20px;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .heart.clicked {
+            animation: heartbeat 0.6s ease-in-out infinite;
+        }
+       
+        
+        @keyframes starsAnimation {
+            from {
+              transform: translateY(0);
+            }
+            to {
+              transform: translateY(-100%);
+            }
+          }
+        
+         
+        
+          .star {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: rgb(255, 255, 255);
+            opacity: 0.5;
+}
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Clicker</title>
+</head>
+<body>
+    <div class="heart-container">
+        <div class="heart clicked"></div>
+    </div>
+    <div class="message">
+        <p id="messageText">Holap</p>
+    </div>
+    <div class="question-container" id="questionContainer">
+        <p>¿Quieres decirme algo?</p>
+        <button class="button button-yes" onclick="openWhatsApp()">Sí</button>
+        <button class="button button-no" onclick="hideInput()">No</button>
+    </div>
+    <div id="spotifyEmbed"></div>
+    <script>
+        
+        const messageText = document.getElementById('messageText');
+        const questionContainer = document.getElementById('questionContainer');
+        const spotifyEmbed = document.getElementById('spotifyEmbed');
+        const messages = [
+            'Pues bueno',
+            'Como te explico lo que siento :/',
+            'Sinceramente eres increíble',
+            'Eres alguien especial para mi',
+            'Y me gustaría decirte muchas o dedicarte muchas cosas',
+            'Y supongo que suena extraño ya que no hablamos mucho',
+            'Pero te quiero y me gustas',
+            'Y creo ya',
+            'Igual no quiero que sientas lo mismo',
+            'Solo quiero que lo veas y lo escuches',
+            'Se bloqueará esta página 🔐 despues de esto 🤯 <br> "Gracias por verlo ❣️" ',
+        ];
+        let messageIndex = 0;
+
+        // Restaura el contador de clics desde el almacenamiento local
+        let clickCount = parseInt(localStorage.getItem('clickCount')) || 0;
+
+        const heart = document.querySelector('.heart');
+        heart.addEventListener('click', () => {
+            if (clickCount < 11) { // Verifica si aún se pueden hacer clics
+                heart.classList.add('clicked');
+                
+                if (messageIndex === 10) {
+                    messageText.innerHTML = messages[messageIndex];
+                    questionContainer.style.display = 'flex';
+                } else {
+                    messageText.textContent = messages[messageIndex];
+                }
+                
+                messageIndex = (messageIndex + 1) % messages.length;
+        
+                spotifyEmbed.style.display = 'block';
+        
+                if (!iframe.getAttribute('src')) {
+                    iframe.src = 'https://open.spotify.com/embed/playlist/6EcvXjnEkuxNGDm6XJVaQA';
+                    spotifyEmbed.appendChild(iframe);
+                }
+        
+                clickCount++; // Incrementa el contador de clics
+        
+                // Almacena el contador de clics en el almacenamiento local
+                localStorage.setItem('clickCount', clickCount);
+            }
+        });
+
+        const playlistTitle = 'Tu Título de Playlist'; // Cambia esto al título deseado
+        const iframe = document.createElement('iframe');
+        iframe.title = `Spotify Embed: ${playlistTitle}`;
+        iframe.width = '100%';
+        iframe.height = '160'; /* Ajusta la altura del reproductor incrustado */
+        iframe.frameBorder = '0';
+        iframe.allow = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; controls';
+        iframe.loading = 'lazy';
+        spotifyEmbed.appendChild(iframe);
+
+
+        function openWhatsApp() {
+            window.open('https://wa.me/5525338668', '_blank');
+        }
+
+        
+
+        function hideInput() {
+            questionContainer.style.display = 'none';
+            messageText.textContent = "Okey, gracias";
+        }
+
+        
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = `${Math.random() * window.innerWidth}px`;
+            star.style.top = `${Math.random() * window.innerHeight}px`;
+            document.body.appendChild(star);
+        
+            const speed = Math.random() * 2 + 1;
+        
+            setInterval(() => {
+                const currentLeft = parseFloat(star.style.left);
+                const newLeft = currentLeft + speed;
+                if (newLeft > window.innerWidth) {
+                    star.style.left = '0px';
+                    star.style.top = `${Math.random() * window.innerHeight}px`;
+                } else {
+                    star.style.left = `${newLeft}px`;
+                }
+            }, 8);
+        }
+        
+
+        
+
+        for (let i = 0; i < 100; i++) {
+            createStar();
+        }
+
+        /* Cookies */
+        document.addEventListener("DOMContentLoaded", function() {
+            const cookieValue = getCookie('deviceCount');
+
+            // Si la cookie no existe o su valor es menor que 2, se permite la visualización
+            if (!cookieValue || parseInt(cookieValue) < 2) {
+                // Incrementar el valor de la cookie o establecerlo a 1 si no existe
+                const newCount = (cookieValue ? parseInt(cookieValue) + 1 : 1);
+                setCookie('deviceCount', newCount, 365); // Establecer la cookie por 1 año
+
+                // Cambiar el contenido del cuerpo para mostrar la página
+                document.body.innerHTML = '<h1>Página visible</h1>';
+            } else {
+                document.body.innerHTML = '<h1>Página no disponible en este dispositivo</h1>';
+            }
+        });
+
+    </script>
+</body>
+</html>
